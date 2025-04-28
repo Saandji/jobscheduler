@@ -1,0 +1,70 @@
+package com.samshend.jobscheduler
+
+import com.samshend.jobscheduler.model.JobDefinition
+import com.samshend.jobscheduler.model.JobInstance
+import com.samshend.jobscheduler.model.JobResult
+import com.samshend.jobscheduler.model.JobStatus
+import java.util.*
+
+/**
+ * Scheduler interface for managing the lifecycle of jobs, including scheduling, querying status,
+ * and retrieving results of previously defined jobs.
+ */
+interface Scheduler {
+
+    /**
+     * Schedules a job for execution based on the provided job definition.
+     *
+     * This method allows the scheduling of a job by encapsulating its details
+     * such as identifier, recurrence strategy, retry policy, and the logic to
+     * be executed upon job execution.
+     *
+     * @param T The type of result produced upon successful execution of the job.
+     * @param definition The `JobDefinition` that encapsulates all the necessary details
+     *                   required to schedule and execute the job.
+     *                   It includes properties such as the job's unique identifier,
+     *                   descriptive name, recurrence strategy, retry policy, and action.
+     * @return A `JobHandle` that represents the scheduled job, allowing further
+     *         interactions such as canceling the job, checking its status, or awaiting its result.
+     */
+    fun <T> schedule(definition: JobDefinition<T>): JobHandle
+
+    /**
+     * Retrieves a list of all currently scheduled or completed job instances managed by the scheduler.
+     *
+     * The returned list includes details such as the job's unique identifier, name, current status,
+     * optional result, and creation timestamp. This method provides a snapshot of the job lifecycle
+     * within the scheduler at the time of invocation.
+     *
+     * @return A list of `JobInstance` objects representing the jobs currently tracked by the scheduler.
+     */
+    fun listJobs(): List<JobInstance>
+
+    /**
+     * Retrieves the current status of a job using its unique identifier.
+     *
+     * This method is used to check the status of a job that has been
+     * scheduled or is in progress. The returned status indicates
+     * whether the job is running, completed, failed, scheduled, or cancelled.
+     *
+     * @param jobId The unique identifier of the job whose status
+     *              is to be retrieved.
+     * @return The current status of the job as a value of the [JobStatus] enum.
+     */
+    fun getJobStatus(jobId: String): JobStatus
+
+    /**
+     * Retrieves the result of a job execution identified by a specific job ID.
+     *
+     * This method returns an optional encapsulated result of the job, including its execution outcome,
+     * the produced result (if any), and any encountered exception. The result is typed to the expected
+     * result type provided.
+     *
+     * @param T The type of result expected from the job execution.
+     * @param jobId The unique identifier of the job whose result is to be retrieved.
+     * @param expectedType The class of the expected result type. Used to ensure type safety when fetching the result.
+     * @return An `Optional` containing a `JobResult` object that encapsulates the execution details and output of the job.
+     *         If the job does not exist or has not completed, an empty `Optional` is returned.
+     */
+    fun <T> getResult(jobId: String, expectedType: Class<T>): Optional<JobResult<T>>
+}
