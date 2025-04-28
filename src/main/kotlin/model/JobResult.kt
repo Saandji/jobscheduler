@@ -11,7 +11,7 @@ package com.samshend.jobscheduler.model
  * @property result The result produced by the job upon successful completion. Null if the job failed or is still running.
  * @property error The exception encountered during job execution, if any. Null if the job completed successfully.
  */
-class JobResult<T>(
+data class JobResult<T>(
     val status: JobStatus,
     val result: T?,
     val error: Throwable?

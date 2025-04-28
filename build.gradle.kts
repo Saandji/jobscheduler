@@ -23,6 +23,10 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
 
+    // ---- Logging ----
+    implementation("io.github.microutils:kotlin-logging:3.0.5")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.12")
+
     // ---- Testing ----
     testImplementation(kotlin("test"))
 }

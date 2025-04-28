@@ -24,10 +24,8 @@ interface Scheduler {
      *                   required to schedule and execute the job.
      *                   It includes properties such as the job's unique identifier,
      *                   descriptive name, recurrence strategy, retry policy, and action.
-     * @return A `JobHandle` that represents the scheduled job, allowing further
-     *         interactions such as canceling the job, checking its status, or awaiting its result.
      */
-    fun <T> schedule(definition: JobDefinition<T>): JobHandle
+    fun <T> schedule(definition: JobDefinition<T>)
 
     /**
      * Retrieves a list of all currently scheduled or completed job instances managed by the scheduler.
@@ -67,4 +65,36 @@ interface Scheduler {
      *         If the job does not exist or has not completed, an empty `Optional` is returned.
      */
     fun <T> getResult(jobId: String, expectedType: Class<T>): Optional<JobResult<T>>
+
+    /**
+     * Cancels the associated job.
+     *
+     * This method attempts to terminate the ongoing execution of the job. If the job is
+     * currently running or scheduled, it transitions to a cancelled state. Cancellation
+     * is a best-effort operation and may not interrupt jobs that are already completed
+     * or finalized.
+     *
+     * @param jobId The unique identifier of the job to be cancelled.
+     * @return `true` if the cancellation was successfully initiated or the job was already cancelled,
+     *         `false` if the job could not be cancelled (e.g., already completed or invalid state).
+     */
+    fun cancelJob(jobId: String): Boolean
+
+    /**
+     * Awaits the completion of the job and retrieves its result.
+     *
+     * This method blocks until the job has completed, failed, or has been explicitly
+     * cancelled. The result of the job is returned encapsulated within a `JobResult` object,
+     * which provides information on the job's outcome, result (if successful), or any error
+     * encountered during execution. The result is type-checked against the provided expected type.
+     *
+     * @param T The type of the result expected from the job.
+     * @param jobId The unique identifier of the job whose result is to be retrieved.
+     * @param expectedType The class of the expected result type. Used to validate the type
+     *                     of the result produced by the job.
+     * @return A `JobResult` object that contains the outcome of the job, which can
+     *         include the resulting value, the status of the job, or any exception that
+     *         occurred during execution.
+     */
+    suspend fun <T> awaitResult(jobId: String, expectedType: Class<T>): JobResult<T>
 }
