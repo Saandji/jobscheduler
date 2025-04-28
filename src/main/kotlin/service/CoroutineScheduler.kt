@@ -8,11 +8,12 @@ import com.samshend.jobscheduler.model.JobResult
 import com.samshend.jobscheduler.model.JobStatus
 import com.samshend.jobscheduler.retry.RetryExecutor
 import com.samshend.jobscheduler.retry.SimpleRetryExecutor
-import com.samshend.jobscheduler.service.model.JobRecord
+import com.samshend.jobscheduler.store.impl.InMemoryJobStorage
+import com.samshend.jobscheduler.store.model.JobRecord
 import kotlinx.coroutines.*
 import mu.KotlinLogging
+import store.JobStorage
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * CoroutineScheduler is an implementation of the Scheduler interface that leverages Kotlin Coroutines
@@ -40,7 +41,8 @@ import java.util.concurrent.ConcurrentHashMap
  * - Exception handling and safe resource cleanup for coroutine jobs.
  */
 class CoroutineScheduler(
-    dispatcher: CoroutineDispatcher = Dispatchers.Default
+    dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val storage: JobStorage = InMemoryJobStorage()
 ) : Scheduler {
 
     val log = KotlinLogging.logger {}
@@ -65,17 +67,14 @@ class CoroutineScheduler(
 
     private val scope = CoroutineScope(SupervisorJob() + dispatcher)
 
-    //internal for testing purposes
-    internal val jobs = ConcurrentHashMap<String, JobRecord>()
-
     @Suppress("UNCHECKED_CAST")
     override fun <T> schedule(definition: JobDefinition<T>) {
         val record = JobRecord(definition)
-        jobs[definition.id] = record
+        storage.saveJob(record)
         scheduleInternal(definition, record)
     }
 
-    override fun listJobs(): List<JobInstance> = jobs.values.map { record ->
+    override fun listJobs(): List<JobInstance> = storage.listAll().map { record ->
         JobInstance(
             id = record.definition.id,
             name = record.definition.name,
@@ -85,17 +84,18 @@ class CoroutineScheduler(
     }
 
     override fun getJobStatus(jobId: String): JobStatus {
-        val record = jobs[jobId] ?: throw ResourceNotFoundException("Job not found: $jobId")
+        val record = storage.getJob(jobId) ?: throw ResourceNotFoundException("Job not found: $jobId")
         return record.status
     }
 
     override fun <T> getResult(jobId: String, expectedType: Class<T>): Optional<JobResult<T>> {
-        val record = jobs[jobId] ?: throw ResourceNotFoundException("Job not found: $jobId")
+        val record = storage.getJob(jobId) ?: throw ResourceNotFoundException("Job not found: $jobId")
         val rawResult = record.result ?: return Optional.empty()
 
         // SAFETY CHECK: Compare declared resultType vs expectedType
         val declaredType = record.definition.resultType
         if (!declaredType.isAssignableFrom(expectedType)) {
+            log.error("[Scheduler] Result type mismatch: job declared $declaredType, but caller expects $expectedType")
             throw IllegalArgumentException(
                 "Result type mismatch: job declared ${declaredType.name}, but caller expects ${expectedType.name}"
             )
@@ -191,7 +191,7 @@ class CoroutineScheduler(
                 }
 
                 else -> {
-                    log.info("[CoroutineScheduler] Job ${def.id} failed with exception: $e")
+                    log.error("[CoroutineScheduler] Job ${def.id} execution failed with exception: ${e.message}", e)
                     synchronized(record) {
                         record.executionResults[record.executionsCompleted] = JobResult(JobStatus.FAILED, null, e)
                         record.result = JobResult(JobStatus.FAILED, null, e)
@@ -210,7 +210,7 @@ class CoroutineScheduler(
      * Attempts to cancel the underlying coroutine.
      */
     override fun cancelJob(jobId: String): Boolean {
-        val record = jobs[jobId] ?: throw ResourceNotFoundException("Job not found: $jobId")
+        val record = storage.getJob(jobId) ?: throw ResourceNotFoundException("Job not found: $jobId")
         val job = record.job ?: return false
 
         return if (job.isActive) {
@@ -230,7 +230,7 @@ class CoroutineScheduler(
     }
 
     override suspend fun <T> awaitResult(jobId: String, expectedType: Class<T>): JobResult<T> {
-        val record = jobs[jobId] ?: throw ResourceNotFoundException("Job not found: $jobId")
+        val record = storage.getJob(jobId) ?: throw ResourceNotFoundException("Job not found: $jobId")
 
         record.job?.join()
 

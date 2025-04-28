@@ -4,10 +4,10 @@ import com.samshend.jobscheduler.exceptions.ResourceNotFoundException
 import com.samshend.jobscheduler.model.JobDefinition
 import com.samshend.jobscheduler.model.JobStatus
 import com.samshend.jobscheduler.service.CoroutineScheduler
+import com.samshend.jobscheduler.store.impl.InMemoryJobStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import com.samshend.jobscheduler.service.model.JobRecord
 import model.RecurrenceConfiguration
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
@@ -17,12 +17,16 @@ import java.time.Duration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CoroutineSchedulerTest {
     val log = KotlinLogging.logger {}
+    
+    private val storage = InMemoryJobStorage()
     private lateinit var scheduler: CoroutineScheduler
 
     @BeforeEach
     fun setup() {
+        storage.clear() //clear the storage before each test to ensure no leftovers from previous tests
         scheduler = CoroutineScheduler(
-            dispatcher = Dispatchers.Default
+            dispatcher = Dispatchers.Default,
+            storage = storage,
         )
     }
 
@@ -277,7 +281,7 @@ class CoroutineSchedulerTest {
             assertNotNull(job)
 
             // Now assert that the executionsCompleted = 3
-            val record = scheduler.getJobRecord(jobId)!!
+            val record = storage.getJob(jobId)!!
 
             assertEquals(3, record.executionsCompleted)
 
@@ -316,7 +320,7 @@ class CoroutineSchedulerTest {
             // Wait for couple of executions to happen
             delay(450)
 
-            val record = scheduler.getJobRecord(jobId)!!
+            val record = storage.getJob(jobId)!!
 
             assertTrue(record.executionsCompleted in 2..9) // should fail somewhere in between
         }
@@ -340,7 +344,7 @@ class CoroutineSchedulerTest {
 
             delay(200) // Allow cancellation to fully propagate
 
-            val record = scheduler.getJobRecord(jobId)!!
+            val record = storage.getJob(jobId)!!
 
             assertEquals(JobStatus.CANCELLED, record.status)
             assertTrue(record.executionsCompleted in 1..3)
@@ -370,7 +374,7 @@ class CoroutineSchedulerTest {
 
             delay(1000) // Enough for several attempts
 
-            val record = scheduler.getJobRecord(jobId)!!
+            val record = storage.getJob(jobId)!!
 
             // Assert that we stored executions properly
             assertEquals(3, record.executionsCompleted) // Should fail at third execution
@@ -380,10 +384,6 @@ class CoroutineSchedulerTest {
             assertNotNull(thirdResult)
             assertEquals(JobStatus.FAILED, thirdResult?.status)
             assertNotNull(thirdResult?.error)
-        }
-
-        private fun CoroutineScheduler.getJobRecord(jobId: String): JobRecord? {
-            return jobs[jobId]
         }
     }
 

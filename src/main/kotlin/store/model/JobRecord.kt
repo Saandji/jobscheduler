@@ -1,4 +1,4 @@
-package com.samshend.jobscheduler.service.model
+package com.samshend.jobscheduler.store.model
 
 import com.samshend.jobscheduler.model.JobDefinition
 import com.samshend.jobscheduler.model.JobResult

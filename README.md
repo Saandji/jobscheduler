@@ -24,43 +24,42 @@ This library was designed to be minimal, clean, and easily extendable.
 
 ## Phase 1 - Core Scheduler
 
-| Task                                                       | Status    | Notes                                 |
-|:-----------------------------------------------------------|:----------|:--------------------------------------|
-| Create core `Scheduler` API                                | ⏳ Planned | Exposed via `CoroutineScheduler`      |
-| Implement in-memory scheduler (`CoroutineScheduler`)       | ⏳ Planned | CoroutineScope with SupervisorJob     |
-| Basic job lifecycle: schedule, run, complete, fail, cancel | ⏳ Planned | Full lifecycle states tracked         |
-| Retry system (fixed + exponential backoff)                 | ⏳ Planned | With configurable retry policies      |
-| Graceful handling of cancellation (`CANCELLED` status)     | ⏳ Planned | Cancelled jobs reported correctly     |
-| Return `JobHandle` to users                                | ⏳ Planned | Includes cancel, getStatus, and await |
-| Java/Kotlin interoperability (`resultType: Class<T>`)      | ⏳ Planned | Clean result casting for Java clients |
-| Minimal sample app to verify behavior                      | ⏳ Planned | Schedules, cancels, and awaits jobs   |
-| In-memory job store (initial)                              | ⏳ Planned | Basic in-memory ConcurrentHashMap     |
+| Task                                                       | Status | Notes                                 |
+|:-----------------------------------------------------------|:-------|:--------------------------------------|
+| Create core `Scheduler` API                                | ✅ Done | Exposed via `CoroutineScheduler`      |
+| Implement in-memory scheduler (`CoroutineScheduler`)       | ✅ Done | CoroutineScope with SupervisorJob     |
+| Basic job lifecycle: schedule, run, complete, fail, cancel | ✅ Done | Full lifecycle states tracked         |
+| Retry system (fixed + exponential backoff)                 | ✅ Done | With configurable retry policies      |
+| Graceful handling of cancellation (`CANCELLED` status)     | ✅ Done | Cancelled jobs reported correctly     |
+| Return `JobHandle` to users                                | ✅ Done | Includes cancel, getStatus, and await |
+| Java/Kotlin interoperability (`resultType: Class<T>`)      | ✅ Done | Clean result casting for Java clients |
+| Minimal sample app to verify behavior                      | ✅ Done | Schedules, cancels, and awaits jobs   |
+| In-memory job store (initial)                              | ✅ Done | Basic in-memory ConcurrentHashMap     |
 
 ---
-
-## Phase 2 - Persistence Layer
-
-| Task                                    | Status    | Notes                               |
-|:----------------------------------------|:----------|:------------------------------------|
-| In-memory job store (initial)           | ⏳ Planned | Basic in-memory ConcurrentHashMap   |
-| File-based persistence                  | ⏳ Planned | Store job state to local disk       |
-| Pluggable store interface (Optional)    | ⏳ Planned | Allow custom storages like DynamoDB |
-| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
 
 ---
 
 ## Wrap Up - Phase 1 and Phase 2
 
-| Task                                    | Status    | Notes                                                |
-|:----------------------------------------|:----------|:-----------------------------------------------------|
-| Finish up documentation                 | ⏳ Planned | Revisit roadmap. Describe architecture, features etc |
-| Deployment artifacts                    | ⏳ Planned | deployment artifacts ready to be pushed to maven     |
-| Sample applications                     | ⏳ Planned | Create sample apps to showcase the work              |
-| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB                  |
+| Task                    | Status    | Notes                                                |
+|:------------------------|:----------|:-----------------------------------------------------|
+| Finish up documentation | ⏳ Planned | Revisit roadmap. Describe architecture, features etc |
+| Deployment artifacts    | ⏳ Planned | deployment artifacts ready to be pushed to maven     |
+| Sample applications     | ⏳ Planned | Create sample apps to showcase the work              |
 
 ---
 
 # Mid-term to Long-term roadmap
+
+## Phase 2 - Persistence Layer
+
+| Task                                    | Status    | Notes                               |
+|:----------------------------------------|:----------|:------------------------------------|
+| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
+| File-based persistence                  | ⏳ Planned | Store job state to local disk       |
+| Pluggable store interface (Optional)    | ⏳ Planned | Allow custom storages like DynamoDB |
+| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
 
 ## 🛅 Phase 3 - Metrics and Monitoring
 
