@@ -32,6 +32,7 @@ JobScheduler is based on Kotlin's powerful coroutine model. At its core, it uses
 - Java clients can use the API fluently with builders and suppliers.
 
 ### Key Architectural Components:
+
 - **Scheduler Interface**: Abstracts job scheduling and management.
 - **CoroutineScheduler**: Default implementation using Kotlin coroutines.
 - **JobDefinition**: Defines all properties of a scheduled job (action, retry, recurrence).
@@ -39,14 +40,16 @@ JobScheduler is based on Kotlin's powerful coroutine model. At its core, it uses
 - **RecurrenceConfiguration**: Models job timing.
 
 ### Future Extensibility:
+
 - Library should be split into multi-module starting from Phase 2
 - Persistence layer can be added through a pluggable storage interface.
 - Monitoring and metrics can be integrated with Micrometer or other metrics libraries.
+  - Allow clients to define SLAs and triggers on those SLAs
 - Dispatcher customization allows tuning for IO, CPU, or mixed workloads.
 - Cron scheduling and distributed cluster support are planned for horizontal scaling.
 - Listeners and potential plug-Ins to enable clients to extend functionality.
 - Web server capabilities can expose REST APIs for job management.
-- transactions support 
+- transactions support
 
 The modular design allows the library to grow while remaining lightweight for simple use cases.
 
@@ -73,11 +76,12 @@ The modular design allows the library to grow while remaining lightweight for si
 
 ## Wrap Up - Phase 1
 
-| Task                    | Status    | Notes                                                |
-|:------------------------|:----------|:-----------------------------------------------------|
-| Finish up documentation | ⏳ Planned | Revisit roadmap. Describe architecture, features etc |
-| Deployment artifacts    | ⏳ Planned | deployment artifacts ready to be pushed to maven     |
-| Sample applications     | ⏳ Planned | Create sample apps to showcase the work              |
+| Task                    | Status | Notes                                                |
+|:------------------------|:-------|:-----------------------------------------------------|
+| Finish up documentation | ✅ Done | Revisit roadmap. Describe architecture, features etc |
+| Deployment artifacts    | ✅ Done | deployment artifacts ready to be pushed to maven     |
+| Sample applications     | ✅ Done | Create sample apps to showcase the work              |
+| Docker example          | ✅ Done | Sample apps packaged and runnign in docker           |
 
 ---
 
@@ -106,10 +110,11 @@ The modular design allows the library to grow while remaining lightweight for si
 
 ## Phase 4 - Metrics and Monitoring
 
-| Task                     | Status    | Notes                                  |
-|:-------------------------|:----------|:---------------------------------------|
-| Integrate Micrometer     | ⏳ Planned | Expose job counts, failures, durations |
-| SLF4J structured logging | ⏳ Planned | Detailed lifecycle event logs          |
+| Task                                                    | Status    | Notes                                         |
+|:--------------------------------------------------------|:----------|:----------------------------------------------|
+| Integrate Micrometer                                    | ⏳ Planned | Expose job counts, failures, durations        |
+| SLF4J structured logging                                | ⏳ Planned | Detailed lifecycle event logs                 |
+| Allow clients to define SLAs and triggers on those SLAs | ⏳ Planned | SLA for jobs and triggers when SLA is reached |
 
 ---
 
