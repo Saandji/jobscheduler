@@ -1,7 +1,10 @@
 package com.samshend.jobscheduler.model
 
 import com.samshend.jobscheduler.retry.RetryPolicy
+import kotlinx.coroutines.suspendCancellableCoroutine
 import model.RecurrenceConfiguration
+import java.util.function.Supplier
+import kotlin.coroutines.resume
 
 
 /**
@@ -18,12 +21,70 @@ import model.RecurrenceConfiguration
  * @property retryPolicy Defines the behavior for handling job retries in case of failures. Defaults to a single attempt e.g. no retries.
  * @property action A suspending function that encapsulates the logic of the job to be executed.
  */
-class JobDefinition<T>(
+class JobDefinition<T> @JvmOverloads constructor(
     val id: String,
     val name: String,
     val recurrenceConfig: RecurrenceConfiguration = RecurrenceConfiguration.once(),
     val retryPolicy: RetryPolicy = RetryPolicy.noRetries,
-    //TODO: Still not 100% sure we want and need this type, but I keep it for until I test with pure java
     val resultType: Class<T>,
     val action: suspend () -> T,
-)
+) {
+
+    /**
+     * Java-friendly constructor: accepts a Supplier instead of suspend function.
+     */
+    constructor(
+        id: String,
+        name: String,
+        recurrenceConfig: RecurrenceConfiguration,
+        retryPolicy: RetryPolicy,
+        resultType: Class<T>,
+        supplier: Supplier<T>
+    ) : this(
+        id,
+        name,
+        recurrenceConfig,
+        retryPolicy,
+        resultType,
+        action = {
+            suspendCancellableCoroutine { cont ->
+                try {
+                    val result = supplier.get()
+                    cont.resume(result)
+                } catch (e: Throwable) {
+                    cont.resumeWith(Result.failure(e))
+                }
+            }
+        }
+    )
+
+    companion object {
+        @JvmStatic
+        fun <T> builder(): JobDefinitionBuilder<T> {
+            return JobDefinitionBuilder()
+        }
+    }
+}
+
+@DslMarker
+annotation class JobDefinitionDsl
+
+@JobDefinitionDsl
+class JobDefinitionBuilder<T> {
+    lateinit var id: String
+    lateinit var name: String
+    var recurrence: RecurrenceConfiguration = RecurrenceConfiguration.once()
+    var retryPolicy: RetryPolicy = RetryPolicy.noRetries
+    lateinit var resultType: Class<T>
+    lateinit var action: suspend () -> T
+
+    fun build(): JobDefinition<T> {
+        return JobDefinition(id, name, recurrence, retryPolicy, resultType, action)
+    }
+}
+
+inline fun <T> jobDefinition(block: JobDefinitionBuilder<T>.() -> Unit): JobDefinition<T> {
+    val builder = JobDefinitionBuilder<T>()
+    builder.block()
+    return builder.build()
+}

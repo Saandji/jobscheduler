@@ -27,14 +27,18 @@ class RecurrenceConfiguration private constructor(
         RecurrenceConfiguration(delay, repeatTimes, interval, expression)
 
     companion object {
+        @JvmStatic
         fun once(): RecurrenceConfiguration = RecurrenceConfiguration()
 
+        @JvmStatic
         fun delayed(delay: Duration): RecurrenceConfiguration =
             RecurrenceConfiguration(delay = delay)
 
+        @JvmStatic
         fun repeat(times: Int, interval: Duration = Duration.ZERO): RecurrenceConfiguration =
             RecurrenceConfiguration(repeatTimes = times, interval = interval)
 
+        @JvmStatic
         fun cron(expression: String): RecurrenceConfiguration =
             RecurrenceConfiguration(cronExpression = expression)
     }

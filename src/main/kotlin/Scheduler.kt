@@ -1,16 +1,39 @@
 package com.samshend.jobscheduler
 
-import com.samshend.jobscheduler.model.JobDefinition
-import com.samshend.jobscheduler.model.JobInstance
-import com.samshend.jobscheduler.model.JobResult
-import com.samshend.jobscheduler.model.JobStatus
+import com.samshend.jobscheduler.model.*
 import java.util.*
 
 /**
- * Scheduler interface for managing the lifecycle of jobs, including scheduling, querying status,
- * and retrieving results of previously defined jobs.
+ * Defines the contract for a scheduler capable of managing job execution.
+ *
+ * The `Scheduler` interface facilitates the scheduling, execution, tracking,
+ * and management of jobs. Jobs are defined using a `JobDefinition` object,
+ * which encapsulates all necessary details for their execution such as a unique
+ * identifier, recurrence configuration, retry policy, and the action to be executed.
+ *
+ * This interface supports job lifecycle operations, including status tracking,
+ * result retrieval, cancellation, and awaiting job completion. Jobs can produce
+ * typed results and are executed as asynchronous tasks.
  */
 interface Scheduler {
+
+    /**
+     * Schedules a job for execution by defining its properties and logic through a builder.
+     *
+     * This method provides a DSL-style interface for creating a job definition, allowing
+     * the caller to specify properties such as the job's unique identifier, name, recurrence
+     * strategy, retry policy, and execution logic. The constructed job is then scheduled
+     * for execution.
+     *
+     * @param T The type of result expected from the job's successful execution.
+     * @param block A lambda with a receiver of type `JobDefinitionBuilder<T>` used to define
+     *              the job's details including its identifier, name, recurrence strategy,
+     *              retry policy, result type, and execution action.
+     */
+    fun <T> scheduleJob(block: JobDefinitionBuilder<T>.() -> Unit) {
+        val def = jobDefinition(block)
+        return schedule(def)
+    }
 
     /**
      * Schedules a job for execution based on the provided job definition.
@@ -96,5 +119,25 @@ interface Scheduler {
      *         include the resulting value, the status of the job, or any exception that
      *         occurred during execution.
      */
+    @JvmSynthetic
     suspend fun <T> awaitResult(jobId: String, expectedType: Class<T>): JobResult<T>
+
+    /**
+     * Blocks the current thread until the job identified by the given ID completes
+     * and retrieves the result of the job execution.
+     *
+     * This method should be used when a blocking operation is acceptable
+     * to wait for a job's completion. The result is encapsulated within a `JobResult`
+     * object, which provides information such as the job status, the result
+     * (if the job completed successfully), or any exception encountered during execution.
+     *
+     * @param T The type of the result expected from the job.
+     * @param jobId The unique identifier of the job whose result is awaited.
+     * @param expectedType The class of the expected result type. Used to validate the
+     *                     type of the result produced by the job.
+     * @return A `JobResult` object that contains the outcome of the job, which
+     *         could include the resulting value, the job status, or any exception
+     *         that occurred during execution.
+     */
+    fun <T> awaitResultBlocking(jobId: String, expectedType: Class<T>): JobResult<T>
 }

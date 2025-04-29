@@ -32,15 +32,14 @@ This library was designed to be minimal, clean, and easily extendable.
 | Retry system (fixed + exponential backoff)                 | ✅ Done | With configurable retry policies      |
 | Graceful handling of cancellation (`CANCELLED` status)     | ✅ Done | Cancelled jobs reported correctly     |
 | Return `JobHandle` to users                                | ✅ Done | Includes cancel, getStatus, and await |
-| Java/Kotlin interoperability (`resultType: Class<T>`)      | ✅ Done | Clean result casting for Java clients |
+| Java/Kotlin interoperability                               | ✅ Done | Clean result casting for Java clients |
 | Minimal sample app to verify behavior                      | ✅ Done | Schedules, cancels, and awaits jobs   |
 | In-memory job store (initial)                              | ✅ Done | Basic in-memory ConcurrentHashMap     |
+| Java-friendly API                                          | ✅ Done | Builder, Supplier etc                 |
 
 ---
 
----
-
-## Wrap Up - Phase 1 and Phase 2
+## Wrap Up - Phase 1
 
 | Task                    | Status    | Notes                                                |
 |:------------------------|:----------|:-----------------------------------------------------|
@@ -61,7 +60,16 @@ This library was designed to be minimal, clean, and easily extendable.
 | Pluggable store interface (Optional)    | ⏳ Planned | Allow custom storages like DynamoDB |
 | Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
 
-## 🛅 Phase 3 - Metrics and Monitoring
+## Phase 3 - Listeners and Job Hooks
+
+| Task                            | Status    | Notes                                   |
+|:--------------------------------|:----------|:----------------------------------------|
+| Job listeners                   | ⏳ Planned | Hooks before and after job execution    |
+| Trigger listeners               | ⏳ Planned | Events for job scheduling, rescheduling |
+| Scheduler lifecycle listeners   | ⏳ Planned | Events for scheduler start/stop/etc     |
+| Plugin-style listener extension | ⏳ Planned | Allow user-registered listener modules  |
+
+## Phase 4 - Metrics and Monitoring
 
 | Task                     | Status    | Notes                                  |
 |:-------------------------|:----------|:---------------------------------------|
@@ -70,14 +78,15 @@ This library was designed to be minimal, clean, and easily extendable.
 
 ---
 
-## 🛅 Phase 4 - Cron and Recurring Scheduling
+## Phase 5 - Cron and Recurring Scheduling
 
 | Task                                | Status    | Notes                           |
 |:------------------------------------|:----------|:--------------------------------|
 | Parse and schedule cron expressions | ⏳ Planned | Recurring jobs with cron syntax |
+| Calendar-based exclusion support    | ⏳ Planned | Skip holidays and blackout days |
 | Retry policies for recurring jobs   | ⏳ Planned | Smart retries per run           |
 
-## 🛅 Phase 5 - Advanced Retry Strategies
+## Phase 6 - Advanced Retry Strategies
 
 | Task                                       | Status    | Notes                          |
 |:-------------------------------------------|:----------|:-------------------------------|
@@ -86,7 +95,7 @@ This library was designed to be minimal, clean, and easily extendable.
 
 ---
 
-## 🛅 Phase 6 - Web/REST Management
+## Phase 7 - Web/REST Management
 
 | Task                       | Status    | Notes                           |
 |:---------------------------|:----------|:--------------------------------|
@@ -95,7 +104,7 @@ This library was designed to be minimal, clean, and easily extendable.
 
 ---
 
-## 🛅 Phase 7 - Distributed Scheduling (Advanced)
+## Phase 8 - Distributed Scheduling (Advanced)
 
 | Task                          | Status    | Notes                    |
 |:------------------------------|:----------|:-------------------------|
