@@ -1,8 +1,8 @@
-# JobScheduler Library
+## JobScheduler Library
 
 A lightweight, coroutine-based Kotlin job scheduler that supports:
 
-- One-time and delayed jobs
+- One-time, repeated and delayed jobs
 - Retry policies (fixed or exponential backoff)
 - Cancellation and lifecycle management
 - Java and Kotlin interop with type-safe result casting
@@ -17,6 +17,38 @@ This library was designed to be minimal, clean, and easily extendable.
 - Be usable from both Java and Kotlin clients easily
 - Support a flexible configuration surface
 - Stay lightweight, pluggable, and production-ready
+- Support storage for jobs and means to list, get and verify jobs as well as cancel them while they still running
+
+---
+
+## Design
+
+JobScheduler is based on Kotlin's powerful coroutine model. At its core, it uses:
+
+- A **SupervisorJob** inside a **CoroutineScope** to allow independent failure of child jobs.
+- Jobs are tracked using an in-memory **ConcurrentHashMap**.
+- Jobs can be scheduled with different recurrence models (once, delayed, recurring in future).
+- Retry strategies are pluggable and configurable per job.
+- Java clients can use the API fluently with builders and suppliers.
+
+### Key Architectural Components:
+- **Scheduler Interface**: Abstracts job scheduling and management.
+- **CoroutineScheduler**: Default implementation using Kotlin coroutines.
+- **JobDefinition**: Defines all properties of a scheduled job (action, retry, recurrence).
+- **RetryExecutor**: Executes retry logic (fixed and exponential backoff).
+- **RecurrenceConfiguration**: Models job timing.
+
+### Future Extensibility:
+- Library should be split into multi-module starting from Phase 2
+- Persistence layer can be added through a pluggable storage interface.
+- Monitoring and metrics can be integrated with Micrometer or other metrics libraries.
+- Dispatcher customization allows tuning for IO, CPU, or mixed workloads.
+- Cron scheduling and distributed cluster support are planned for horizontal scaling.
+- Listeners and potential plug-Ins to enable clients to extend functionality.
+- Web server capabilities can expose REST APIs for job management.
+- transactions support 
+
+The modular design allows the library to grow while remaining lightweight for simple use cases.
 
 ---
 
