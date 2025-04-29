@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.20"
     application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {
@@ -17,5 +18,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.example.SampleApp")
+    mainClass.set("examples.HelloWorldJobExample")
 }

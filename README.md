@@ -53,21 +53,24 @@ This library was designed to be minimal, clean, and easily extendable.
 
 ## Phase 2 - Persistence Layer
 
-| Task                                    | Status    | Notes                               |
-|:----------------------------------------|:----------|:------------------------------------|
-| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
-| File-based persistence                  | ⏳ Planned | Store job state to local disk       |
-| Pluggable store interface (Optional)    | ⏳ Planned | Allow custom storages like DynamoDB |
-| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB |
+| Task                                    | Status    | Notes                                               |
+|:----------------------------------------|:----------|:----------------------------------------------------|
+| Auto-update from Persistence on startup | ⏳ Planned | Allow custom storages like DynamoDB                 |
+| File-based persistence                  | ⏳ Planned | Store job state to local disk                       |
+| Pluggable store interface (Optional)    | ⏳ Planned | Allow custom storages like DynamoDB                 |
+| Auto-update from Persistence on startup | ⏳ Planned | Extra feature to restart and continue where left of |
 
-## Phase 3 - Listeners and Job Hooks
+## Phase 3 - Listeners, Job Hooks and Configurable Dispatchers
 
-| Task                            | Status    | Notes                                   |
-|:--------------------------------|:----------|:----------------------------------------|
-| Job listeners                   | ⏳ Planned | Hooks before and after job execution    |
-| Trigger listeners               | ⏳ Planned | Events for job scheduling, rescheduling |
-| Scheduler lifecycle listeners   | ⏳ Planned | Events for scheduler start/stop/etc     |
-| Plugin-style listener extension | ⏳ Planned | Allow user-registered listener modules  |
+| Task                                            | Status    | Notes                                     |
+|:------------------------------------------------|:----------|:------------------------------------------|
+| Job listeners                                   | ⏳ Planned | Hooks before and after job execution      |
+| Trigger listeners                               | ⏳ Planned | Events for job scheduling, rescheduling   |
+| Scheduler lifecycle listeners                   | ⏳ Planned | Events for scheduler start/stop/etc       |
+| Plugin-style listener extension                 | ⏳ Planned | Allow user-registered listener modules    |
+| Configurable dispatchers                        | ⏳ Planned | Allow passing custom CoroutineDispatchers |
+| Defaults like "CPU Intensive", "IO Intensive"   | ⏳ Planned | Predefined dispatcher profiles            |
+| Optionally choose dispatcher per job (advanced) | ⏳ Planned | Fine-grained dispatcher assignment        |
 
 ## Phase 4 - Metrics and Monitoring
 

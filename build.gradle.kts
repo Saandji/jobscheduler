@@ -32,7 +32,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.samshend.jobscheduler.MainKt")
+    mainClass.set("com.samshend.jobscheduler.Scheduler")
 }
 
 tasks.test {
@@ -48,29 +48,60 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+
+            groupId = "com.samshend"
+            artifactId = "jobscheduler"
+            version = "0.1.0"
+
             pom {
-                name.set("Job Scheduler Library")
-                description.set("A coroutine-based job scheduler for Kotlin & Java")
-                url.set("https://github.com/yourorg/jobscheduler")
+                name.set("JobScheduler")
+                description.set("Lightweight coroutine-based job scheduler for Kotlin and Java applications.")
+                url.set("https://github.com/Saandji/jobscheduler") // link to your repo
+
                 licenses {
                     license {
-                        name.set("Apache-2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
                     }
                 }
                 developers {
                     developer {
-                        id.set("you")
-                        name.set("Your Name")
+                        id.set("samshend")
+                        name.set("Sam Shendyapin")
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/yourorg/jobscheduler.git")
-                    developerConnection.set("scm:git:ssh://github.com/yourorg/jobscheduler.git")
-                    url.set("https://github.com/yourorg/jobscheduler")
+                    connection.set("scm:git:https://github.com/Saandji/jobscheduler.git")
+                    developerConnection.set("scm:git:ssh://github.com:Saandji/jobscheduler.git")
+                    url.set("https://github.com/Saandji/jobscheduler")
                 }
             }
         }
     }
-    // add your deployment repositories here when ready
+}
+tasks.withType<Jar> {
+    manifest {
+        attributes["Implementation-Title"] = "JobScheduler"
+        attributes["Implementation-Version"] = "0.1.0"
+    }
+}
+
+// Optional but strongly recommended:
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.javadoc)
+}
+
+publishing {
+    publications {
+        named<MavenPublication>("mavenJava") {
+            artifact(tasks.named("sourcesJar"))
+            artifact(tasks.named("javadocJar"))
+        }
+    }
 }
