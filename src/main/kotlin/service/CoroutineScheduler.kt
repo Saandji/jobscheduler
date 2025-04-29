@@ -41,7 +41,6 @@ import java.util.*
  * - Exception handling and safe resource cleanup for coroutine jobs.
  */
 class CoroutineScheduler(
-    dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val storage: JobStorage = InMemoryJobStorage()
 ) : Scheduler {
 
@@ -65,7 +64,15 @@ class CoroutineScheduler(
      */
     private val retryExecutor: RetryExecutor = SimpleRetryExecutor()
 
-    private val scope = CoroutineScope(SupervisorJob() + dispatcher)
+
+    /**
+     * A `CoroutineScope` associated with the `CoroutineScheduler` to manage the execution
+     * of scheduled jobs. It uses a `SupervisorJob` to allow independent failure of child coroutines
+     * and the `Dispatchers.Default` for performing background computational work.
+     *
+     * TODO: see Phase 3 for configurable Dispatchers feature
+     */
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> schedule(definition: JobDefinition<T>) {
@@ -242,5 +249,9 @@ class CoroutineScheduler(
             result = expectedType.cast(rawResult.result),
             error = rawResult.error
         )
+    }
+
+    override fun <T> awaitResultBlocking(jobId: String, expectedType: Class<T>): JobResult<T> {
+        return runBlocking { awaitResult(jobId, expectedType) }
     }
 }

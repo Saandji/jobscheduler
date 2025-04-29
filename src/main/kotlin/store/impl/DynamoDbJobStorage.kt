@@ -43,7 +43,4 @@ class DynamoDbJobStorage : JobStorage {
         TODO("Not yet implemented")
     }
 
-    override fun flush() {
-        TODO("Not yet implemented")
-    }
 }

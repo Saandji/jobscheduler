@@ -1,13 +1,14 @@
 package service
 
+import com.samshend.jobscheduler.Scheduler
 import com.samshend.jobscheduler.exceptions.ResourceNotFoundException
 import com.samshend.jobscheduler.model.JobDefinition
 import com.samshend.jobscheduler.model.JobStatus
 import com.samshend.jobscheduler.service.CoroutineScheduler
 import com.samshend.jobscheduler.store.impl.InMemoryJobStorage
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import model.JobDefinitionBuilder
 import model.RecurrenceConfiguration
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
@@ -17,15 +18,14 @@ import java.time.Duration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CoroutineSchedulerTest {
     val log = KotlinLogging.logger {}
-    
+
     private val storage = InMemoryJobStorage()
-    private lateinit var scheduler: CoroutineScheduler
+    private lateinit var scheduler: Scheduler
 
     @BeforeEach
     fun setup() {
         storage.clear() //clear the storage before each test to ensure no leftovers from previous tests
         scheduler = CoroutineScheduler(
-            dispatcher = Dispatchers.Default,
             storage = storage,
         )
     }
@@ -257,6 +257,25 @@ class CoroutineSchedulerTest {
             scheduler.schedule(cronJobDef)
         }
         assertEquals("Cron recurrence not yet supported", ex.message)
+    }
+
+    @Test
+    fun `awaitResultBlocking should wait until job finishes`() {
+        val scheduler = CoroutineScheduler()
+
+        val job = JobDefinitionBuilder<String>()
+            .id("blocking-test")
+            .name("BlockingAwait")
+            .resultType(String::class.java)
+            .recurrence(RecurrenceConfiguration.delayed(Duration.ofMillis(100)))
+            .action { "Hello from blocking test" }
+            .build()
+
+        scheduler.schedule(job)
+
+        val result = scheduler.awaitResultBlocking("blocking-test", String::class.java)
+
+        assertEquals("Hello from blocking test", result.result)
     }
 
     @Nested

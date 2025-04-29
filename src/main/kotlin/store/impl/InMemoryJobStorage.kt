@@ -26,8 +26,4 @@ class InMemoryJobStorage : JobStorage {
     override fun clear() {
         jobs.clear()
     }
-
-    override fun flush() {
-        throw UnsupportedOperationException("InMemoryJobStorage does not support flush")
-    }
 }

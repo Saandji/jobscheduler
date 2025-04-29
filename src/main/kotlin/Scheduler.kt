@@ -1,6 +1,9 @@
 package com.samshend.jobscheduler
 
-import com.samshend.jobscheduler.model.*
+import com.samshend.jobscheduler.model.JobDefinition
+import com.samshend.jobscheduler.model.JobInstance
+import com.samshend.jobscheduler.model.JobResult
+import com.samshend.jobscheduler.model.JobStatus
 import java.util.*
 
 /**
@@ -16,24 +19,6 @@ import java.util.*
  * typed results and are executed as asynchronous tasks.
  */
 interface Scheduler {
-
-    /**
-     * Schedules a job for execution by defining its properties and logic through a builder.
-     *
-     * This method provides a DSL-style interface for creating a job definition, allowing
-     * the caller to specify properties such as the job's unique identifier, name, recurrence
-     * strategy, retry policy, and execution logic. The constructed job is then scheduled
-     * for execution.
-     *
-     * @param T The type of result expected from the job's successful execution.
-     * @param block A lambda with a receiver of type `JobDefinitionBuilder<T>` used to define
-     *              the job's details including its identifier, name, recurrence strategy,
-     *              retry policy, result type, and execution action.
-     */
-    fun <T> scheduleJob(block: JobDefinitionBuilder<T>.() -> Unit) {
-        val def = jobDefinition(block)
-        return schedule(def)
-    }
 
     /**
      * Schedules a job for execution based on the provided job definition.

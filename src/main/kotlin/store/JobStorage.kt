@@ -19,5 +19,4 @@ interface JobStorage {
     fun getJob(jobId: String): JobRecord?
     fun listAll(): Collection<JobRecord>
     fun clear()
-    fun flush()
 }

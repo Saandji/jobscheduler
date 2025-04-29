@@ -57,34 +57,4 @@ class JobDefinition<T> @JvmOverloads constructor(
             }
         }
     )
-
-    companion object {
-        @JvmStatic
-        fun <T> builder(): JobDefinitionBuilder<T> {
-            return JobDefinitionBuilder()
-        }
-    }
-}
-
-@DslMarker
-annotation class JobDefinitionDsl
-
-@JobDefinitionDsl
-class JobDefinitionBuilder<T> {
-    lateinit var id: String
-    lateinit var name: String
-    var recurrence: RecurrenceConfiguration = RecurrenceConfiguration.once()
-    var retryPolicy: RetryPolicy = RetryPolicy.noRetries
-    lateinit var resultType: Class<T>
-    lateinit var action: suspend () -> T
-
-    fun build(): JobDefinition<T> {
-        return JobDefinition(id, name, recurrence, retryPolicy, resultType, action)
-    }
-}
-
-inline fun <T> jobDefinition(block: JobDefinitionBuilder<T>.() -> Unit): JobDefinition<T> {
-    val builder = JobDefinitionBuilder<T>()
-    builder.block()
-    return builder.build()
 }
